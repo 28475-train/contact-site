@@ -1,0 +1,22 @@
+<h2>お問い合わせフォーム</h2>
+
+<form id="form">
+  <input name="name" placeholder="お名前" required><br>
+  <input name="email" placeholder="メールアドレス" required><br>
+  <textarea name="message" placeholder="お問い合わせ内容" required></textarea><br>
+  <button>送信</button>
+</form>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzhcvSktzjhsokOMdfRp_Jv3K5QiFuyDRDxsDfFyR4QEi0P66JZTQP4KFXRLNqdM4Iu/exec";
+
+document.getElementById("form").onsubmit = async(e)=>{
+  e.preventDefault();
+  const form = new FormData(e.target);
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify(Object.fromEntries(form))
+  });
+  alert("送信しました！（Googleシートに反映されます）");
+};
+</script>
