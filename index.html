@@ -1,22 +1,122 @@
-<h2>お問い合わせフォーム</h2>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>オリジナルAIチャット</title>
 
-<form id="form">
-  <input name="name" placeholder="お名前" required><br>
-  <input name="email" placeholder="メールアドレス" required><br>
-  <textarea name="message" placeholder="お問い合わせ内容" required></textarea><br>
-  <button>送信</button>
-</form>
+<style>
+body {
+  margin:0;
+  background:#f5f5f5;
+  font-family: "Helvetica", "Meiryo", sans-serif;
+}
+
+/* ★ チャットウィンドウ */
+#chat-container {
+  width: 350px;
+  height: 500px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* メッセージ一覧 */
+#messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.5em;
+}
+
+/* 吹き出し */
+.msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+}
+.user {
+  background:#000;
+  color:white;
+  margin-left:auto;
+  border-bottom-right-radius:0;
+}
+.bot {
+  background:#eee;
+  margin-right:auto;
+  border-bottom-left-radius:0;
+}
+
+/* 入力UI */
+#input-zone {
+  display:flex;
+  border-top:1px solid #ddd;
+}
+#input {
+  flex:1;
+  border:none;
+  padding:12px;
+  font-size:15px;
+  outline:none;
+}
+#send {
+  width:70px;
+  border:none;
+  background:#000;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+#send:hover { opacity:.8; }
+</style>
+</head>
+
+<body>
+
+<!--◆◆◆ AIチャットUI ◆◆◆-->
+<div id="chat-container">
+  <div id="messages"></div>
+
+  <div id="input-zone">
+    <input id="input" placeholder="質問を入力..." onkeydown="if(event.key==='Enter') send();">
+    <button id="send" onclick="send()">送信</button>
+  </div>
+</div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbzhcvSktzjhsokOMdfRp_Jv3K5QiFuyDRDxsDfFyR4QEi0P66JZTQP4KFXRLNqdM4Iu/exec";
+const API_URL = "YOUR_GAS_WEB_URL"; // ← 必ずここを書き換え！
 
-document.getElementById("form").onsubmit = async(e)=>{
-  e.preventDefault();
-  const form = new FormData(e.target);
-  await fetch(API,{
+async function send(){
+  const text = document.getElementById("input").value.trim();
+  if(!text) return;
+
+  addMsg(text, "user");
+  document.getElementById("input").value="";
+
+  const res = await fetch(API_URL,{
     method:"POST",
-    body:JSON.stringify(Object.fromEntries(form))
+    body:JSON.stringify({ message:text })
   });
-  alert("送信しました！（Googleシートに反映されます）");
-};
+  const data = await res.json();
+
+  addMsg(data.reply,"bot");
+}
+
+function addMsg(text,type){
+  const box = document.getElementById("messages");
+  box.innerHTML += `<div class="msg ${type}">${text}</div>`;
+  box.scrollTop = box.scrollHeight;
+}
 </script>
+
+</body>
+</html>
